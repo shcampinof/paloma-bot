@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Chat de atención al cliente</title>
+  <style>
+    /* Reset básico */
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    button { font: inherit; line-height: 1; appearance: none; background: transparent; border: 0; cursor: pointer; }
+
+    body{
+      display:flex; flex-direction:column; justify-content:center; align-items:center;
+      background:
+        linear-gradient(to top, rgba(4,17,57,0.7) 20%, rgba(4,17,57,0.35) 50%, rgba(4,17,57,0) 90%),
+        url("{{ url_for('static', filename='images/Fondo.jpg') }}") center / cover no-repeat fixed,
+        linear-gradient(135deg, #003366, #004F9F);
+      color:#fff; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+
+    /* Header fijo */
+    #header{
+      position:fixed; top:0; left:0; width:100%;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:10px 20px; background:#004F9F; color:#fff;
+      box-shadow:0 4px 10px rgba(0,0,0,.2); z-index:100;
+    }
+    #company-name{ font-size:20px; font-weight:600; margin-left:10px; white-space:nowrap; }
+    #menu-buttons{ display:flex; gap:12px; align-items:center; }
+    .menu-button{
+      display:inline-flex; align-items:center; justify-content:center;
+      padding:8px 12px; border-radius:8px; color:#fff; white-space:nowrap; transition: background .2s;
+    }
+    .menu-button:hover{ background: rgba(255,255,255,.12); }
+    .menu-button:focus{ outline:2px solid #fff; outline-offset:2px; }
+
+    /* Contenedor del chatbot */
+    #chat-container{
+      width:100%; max-width:520px;
+      background:rgba(255,255,255,.96);
+      border-radius:20px;
+      box-shadow:0 8px 20px rgba(0,0,0,.3);
+      overflow:hidden; display:flex; flex-direction:column;
+      margin-top:90px;
+    }
+
+    #chat-header{
+      display:flex; align-items:center; justify-content:center;
+      padding:14px 16px; background:#004F9F; color:#fff;
+      font-size:18px; font-weight:600;
+    }
+
+    #chatbox{
+      height:520px; padding:16px; overflow-y:auto;
+      display:flex; flex-direction:column; gap:10px;
+      scroll-behavior: smooth;
+    }
+
+    .message{
+      max-width:78%; padding:10px 14px; border-radius:14px;
+      font-size:15px; line-height:1.45; word-wrap: break-word; white-space:normal;
+    }
+    .user-message{ align-self:flex-end; background:#004F9F; color:#fff; border-top-right-radius:4px; }
+    .bot-message{ align-self:flex-start; background:#f5f6f8; color:#222; border-top-left-radius:4px; }
+
+    /* Estilos Markdown dentro del mensaje del bot */
+    .bot-message h1, .bot-message h2, .bot-message h3 { margin: .2rem 0 .4rem; font-weight:700; }
+    .bot-message h3 { font-size: 1.05rem; }
+    .bot-message p { margin:.25rem 0 .5rem; }
+    .bot-message ul, .bot-message ol { margin:.25rem 0 .75rem 1.25rem; }
+    .bot-message li { margin:.15rem 0; }
+    .bot-message a { color:#0b5cab; text-decoration: underline; }
+    .bot-message code { background:#eef1f6; padding:.1rem .25rem; border-radius:4px; }
+    .bot-message table { border-collapse: collapse; width:100%; margin:.4rem 0 .7rem; }
+    .bot-message th, .bot-message td { border:1px solid #e2e6ee; padding:.35rem .5rem; text-align:left; }
+    .bot-message th { background:#eef2f8; }
+
+    .bot-buttons{ display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; }
+    .bot-buttons button{
+      padding:8px 12px; font-size:14px; border-radius:10px; border:1px solid #d6d9e0;
+      background:#ffffff; color:#0b2850;
+    }
+    .bot-buttons button:hover{ background:#f2f6ff; border-color:#c7d5ff; }
+
+    #user-input-container{ display:flex; border-top:1px solid #e5e7eb; background:#f9fafb; }
+    #user-input{ flex:1; padding:12px; font-size:16px; border:none; outline:none; background:#fff; color:#111827; }
+    #send-button{ background:#004F9F; border:none; color:#fff; padding:12px 14px; transition:background .2s; }
+    #send-button:hover{ background:#003366; }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div id="header">
+    <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="Logo Defensoría" style="width:50px;height:50px;border-radius:15%;">
+    <div id="company-name">Defensoría del Pueblo - Atención al usuario</div>
+    <div id="menu-buttons">
+      <button class="menu-button">Contáctanos</button>
+      <button class="menu-button">Guía de Usuario</button>
+    </div>
+  </div>
+
+  <!-- Chat -->
+  <div id="chat-container">
+    <div id="chat-header">Paloma bot - Defensoría del Pueblo</div>
+    <div id="chatbox" aria-live="polite"></div>
+    <div id="user-input-container">
+      <input type="text" id="user-input" placeholder="Escribe un mensaje..." autocomplete="off"
+             onkeydown="if(event.key==='Enter'){ sendMessage(); }"/>
+      <button id="send-button" onclick="sendMessage()">Enviar</button>
+    </div>
+  </div>
+
+  <!-- Libs para Markdown + Sanitizado -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
+
+<script>
+  // ====== Markdown seguro ======
+  marked.setOptions({ gfm: true, breaks: true });
+
+  function renderMarkdown(mdText) {
+    const html = marked.parse(mdText || "");
+    const clean = DOMPurify.sanitize(html, { ADD_ATTR: ['target','rel'] });
+    // abrir links en pestaña nueva
+    const tmp = document.createElement('div');
+    tmp.innerHTML = clean;
+    tmp.querySelectorAll('a').forEach(a => { a.target = '_blank'; a.rel = 'noopener noreferrer'; });
+    return tmp.innerHTML;
+  }
+
+  // ====== Utilidades UI ======
+  const chatbox = document.getElementById("chatbox");
+  const sendBtn = document.getElementById("send-button");
+  const inputEl = document.getElementById("user-input");
+
+  function scrollToBottom() {
+    chatbox.scrollTop = chatbox.scrollHeight;
+  }
+
+  function addUserMessage(text) {
+    const bubble = document.createElement('div');
+    bubble.className = 'message user-message';
+    const who = document.createElement('strong');
+    who.textContent = 'Tú: ';
+    bubble.appendChild(who);
+    bubble.appendChild(document.createTextNode(text)); // seguro (sin HTML)
+    chatbox.appendChild(bubble);
+    scrollToBottom();
+  }
+
+  function addBotMessage(mdText) {
+    const bubble = document.createElement('div');
+    bubble.className = 'message bot-message';
+    bubble.innerHTML = `<strong>Paloma:</strong> ${renderMarkdown(mdText)}`;
+    chatbox.appendChild(bubble);
+    scrollToBottom();
+  }
+
+  function addBotButtons(buttons) {
+    if (!buttons || !buttons.length) return;
+    const wrap = document.createElement('div');
+    wrap.className = 'bot-buttons';
+    buttons.forEach(b => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.textContent = b.title;
+      btn.onclick = () => sendPayload(b.payload);
+      wrap.appendChild(btn);
+    });
+    chatbox.appendChild(wrap);
+    scrollToBottom();
+  }
+
+  // (Opcional) Render básico para payloads custom tipo "card"
+  function renderCard(custom) {
+    if (!custom || custom.type !== 'card') return false;
+    const card = document.createElement('div');
+    card.className = 'message bot-message';
+    let html = `<strong>Paloma:</strong><div style="margin-top:.25rem"><div style="font-weight:700;margin-bottom:.25rem">${DOMPurify.sanitize(custom.title||'')}</div>`;
+    if (Array.isArray(custom.fields)) {
+      html += '<table style="border-collapse:collapse;width:100%">';
+      custom.fields.forEach(f => {
+        html += `<tr><th style="text-align:left;border:1px solid #e2e6ee;padding:.35rem .5rem;background:#eef2f8">${DOMPurify.sanitize(f.label||'')}</th>
+                 <td style="border:1px solid #e2e6ee;padding:.35rem .5rem">${DOMPurify.sanitize(f.value||'')}</td></tr>`;
+      });
+      html += '</table>';
+    }
+    html += '</div>';
+    card.innerHTML = html;
+    chatbox.appendChild(card);
+    if (Array.isArray(custom.actions) && custom.actions.length) addBotButtons(custom.actions);
+    scrollToBottom();
+    return true;
+  }
+
+  // ====== Manejo de respuestas del backend ======
+  function handleResponseData(data) {
+    console.log('DEBUG payload ↓', data);
+
+    // A) Rasa REST: lista de mensajes
+    if (Array.isArray(data)) {
+      if (data.length === 0) { addBotMessage('No recibí contenido del servidor.'); return; }
+      data.forEach(m => {
+        if (m.text)   addBotMessage(m.text);
+        if (m.buttons) addBotButtons(m.buttons);
+        if (m.image)  addBotMessage(`![imagen](${m.image})`); // simple render de imagen via Markdown
+        if (m.custom) renderCard(m.custom); // si mandas JSON desde actions
+      });
+      return;
+    }
+
+    // B) Formato Flask anterior: { bot_response: "...", buttons?: [...] }
+    if (data && typeof data === 'object') {
+      const text = data.bot_response ?? data.text ?? '';
+      if (text) addBotMessage(text);
+      if (Array.isArray(data.buttons)) addBotButtons(data.buttons);
+      return;
+    }
+
+    // C) String plano
+    if (typeof data === 'string') { addBotMessage(data); return; }
+
+    addBotMessage('Lo siento, no entendí la respuesta del servidor.');
+  }
+
+  // ====== Envío de mensajes ======
+  async function sendMessage() {
+    const text = (inputEl.value || '').trim();
+    if (!text) return;
+    addUserMessage(text);
+    inputEl.value = '';
+    sendBtn.disabled = true;
+
+    try {
+      const r = await fetch('/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text })
+      });
+      const data = await r.json();
+      handleResponseData(data);
+    } catch (err) {
+      console.error(err);
+      addBotMessage(`Error de conexión: ${err.message}`);
+    } finally {
+      sendBtn.disabled = false;
+      inputEl.focus();
+    }
+  }
+
+  async function sendPayload(payload) {
+    try {
+      const r = await fetch('/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: payload })
+      });
+      const data = await r.json();
+      handleResponseData(data);
+    } catch (err) {
+      console.error(err);
+      addBotMessage(`Error de conexión: ${err.message}`);
+    }
+  }
+
+  // Enter para enviar (por si no lo tienes en el input)
+  inputEl.addEventListener('keydown', e => { if (e.key === 'Enter') sendMessage(); });
+</script>
+
+</body>
+</html>

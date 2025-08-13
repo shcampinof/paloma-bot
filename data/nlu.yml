@@ -1,0 +1,783 @@
+version: "3.1"
+
+nlu:
+
+# Intents básicos - Small talk
+
+- intent: saludar
+  examples: |
+    - hola
+    - ola
+    - buenas
+    - buenos días  
+    - buenas tardes
+    - buenas noches
+    - qué tal
+    - hey
+    - holi
+    - saludos
+    - buen día
+    - cómo está
+    - hola, buenos días
+    - hi
+    - hello
+    - holaa
+    - hola!
+    - buenos días!
+    - buenas!
+    - qué tal!
+    - oe
+    - ole
+    - ey
+    - eyyy
+    - qué tal cómo andas
+    - hola buen día
+    - buen día
+    - muy buenas
+    - qué hubo
+
+
+- intent: despedirse
+  examples: |
+    - chao
+    - chau
+    - adiós
+    - hasta luego
+    - nos vemos
+    - me despido
+    - gracias, chao
+    - hasta pronto
+    - que tenga buen día
+    - me voy
+    - bye
+    - hasta la vista
+    - cuídese
+    - que esté bien
+    - chao gracias
+    - hasta luego gracias
+    - me retiro
+    - hasta otra
+    - nos vemos luego
+
+- intent: agradecer
+  examples: |
+    - gracias
+    - muchas gracias
+    - mil gracias
+    - te lo agradezco
+    - qué amable
+    - muy amable
+    - agradecido
+    - se lo agradezco
+    - te lo agradezco
+    - thanks
+    - gracias por la información
+    - agradezco la ayuda
+    - muy agradecido
+    - infinitas gracias
+    - gracias por todo
+    - perfecto gracias
+
+- intent: pedir_ayuda
+  examples: |
+    - necesito ayuda
+    - me ayudas
+    - requiero asistencia
+    - me puedes orientar
+    - me apoyas
+    - ayúdame
+    - qué debo hacer
+    - me puedes guiar
+    - necesito que me ayudes
+    - requiero apoyo
+    - me puedes asistir
+    - necesito asistencia
+    - auxilio
+    - socorro
+    - apoyo
+    - ayuda por favor
+    - me colaboras
+    - ¿me puedes ayudar?
+    - ¿puedes asistirme?
+
+- intent: pedir_informacion
+  examples: |
+    - quiero información
+    - necesito saber sobre
+    - me puedes informar
+    - cuéntame sobre
+    - qué información tienes
+    - dime sobre
+    - quisiera conocer
+    - información por favor
+    - información
+    - informacion
+    - info
+    - dame info
+    - necesito información
+    - me das información
+    - cuéntame información
+    - ¿me puedes dar información?
+    - ¿qué información tienes?
+    - dame información
+    - qué info tienes
+    - necesito info
+    - ayuda con información
+    - me das info
+    - quiero saber
+    - dime algo
+    - qué me puedes decir
+    - orientación
+    - asesoría
+    - necesito orientación
+    - dime qué puedes hacer
+    - qué servicios tienes
+    - sobre qué me puedes informar
+    - ¿qué puedes hacer?
+    - ¿qué servicios ofrecen?
+    - cuéntame sobre los servicios
+    - me gustaría saber más sobre tus servicios
+
+- intent: preguntar_estado
+  examples: |
+    - cómo estás
+    - cómo te encuentras
+    - ¿cómo te encuentras?
+    - ¿qué tal estás?
+    - qué tal vas
+    - cómo andas
+    - cómo va todo
+    - cómo te va
+    - cómo sigues
+    - todo bien contigo
+    - cómo has estado
+    - qué tal todo
+    - cómo está todo
+    - todo bien por allá
+    - qué tal todo por ahí
+
+
+- intent: responder_bien
+  examples: |
+    - bien
+    - bien, ¿y tú cómo estás?
+    - estoy bien y tú
+    - muy bien
+    - todo bien
+    - excelente
+    - de maravilla
+    - súper bien
+    - bien gracias
+    - excelente gracias
+    - todo perfecto
+    - muy bien gracias
+    - todo de maravilla
+    - genial
+    - fantástico
+    - súper
+    - todo en orden
+
+- intent: responder_mal
+  examples: |
+    - mal
+    - mal y tú
+    - mal, ¿y tú cómo estás?
+    - estoy mal y tú
+    - no muy bien
+    - regular
+    - he tenido problemas
+    - no tan bien
+    - podría estar mejor
+    - tengo dificultades
+    - fatal
+    - terrible
+    - muy mal
+    - pesimo
+    - no bien
+    - más o menos
+    - ahí vamos
+    - complicado
+
+- intent: afirmar
+  examples: |
+    - sí
+    - si
+    - claro
+    - por supuesto
+    - correcto
+    - exacto
+    - así es
+    - de acuerdo
+    - ok
+    - okay
+    - vale
+    - efectivamente
+    - cierto
+    - confirmo
+    - está bien
+    - perfecto
+    - dale
+    - listo
+    - aja
+    - ujum
+
+- intent: negar
+  examples: |
+    - no
+    - para nada
+    - no es correcto
+    - negativo
+    - no gracias
+    - no quiero
+    - no necesito
+    - jamás
+    - nunca
+    - ni hablar
+    - de ninguna manera
+    - no señor
+    - no señora
+    - no way
+    - nope
+    - nel
+    - no no no
+
+- intent: inform
+  examples: |
+    - Juan Pérez
+    - María García
+    - 12345678
+    - mi nombre es Carlos
+    - soy Ana López
+    - cedula 87654321
+    - carlos.lopez@email.com
+    - mi correo es ana@gmail.com
+    - vivo en Bogotá
+    - trabajo en Medellín
+    - tengo 25 años
+    - estudiante
+    - ingeniero
+    - abogada
+    - pensionado
+    - ama de casa
+
+# Información institucional
+
+- intent: mision
+  examples: |
+    - cuál es la misión de la Defensoría
+    - misión de la defensoría del pueblo
+    - a qué se dedica la defensoría
+    - qué hace la defensoría del pueblo
+    - función misional
+    - propósito de la defensoría
+    - para qué sirve la defensoría
+    - objetivo de la defensoría
+    - función principal
+    - qué es la defensoría
+    - para qué existe la defensoría
+
+- intent: vision
+  examples: |
+    - cuál es la visión de la Defensoría
+    - visión institucional
+    - hacia dónde va la defensoría
+    - visión 2028 de la defensoría
+    - objetivo a futuro
+    - meta de la defensoría
+    - proyección de la defensoría
+    - futuro de la defensoría
+
+- intent: funciones
+  examples: |
+    - funciones del Defensor del Pueblo
+    - qué funciones tiene la defensoría
+    - deberes de la entidad
+    - qué hace el defensor del pueblo
+    - atribuciones del defensor
+    - competencias de la defensoría
+    - roles de la defensoría
+    - responsabilidades del defensor
+    - tareas de la defensoría
+
+- intent: principios_valores
+  examples: |
+    - principios y valores de la Defensoría
+    - cuáles son los principios
+    - valores institucionales
+    - qué valores promueven
+    - principios de la entidad
+    - valores de la defensoría
+    - principios éticos
+    - valores morales
+    - código de valores
+
+- intent: codigo_integridad
+  examples: |
+    - código de integridad
+    - valores éticos de la defensoría
+    - código ético
+    - estándares de conducta
+    - normas éticas
+    - código de conducta
+    - ética institucional
+
+# Canales y contacto
+
+- intent: canales_atencion
+  examples: |
+    - canales de atención
+    - por dónde puedo radicar una petición
+    - cómo contactar la defensoría
+    - medios de atención
+    - formas de comunicarse
+    - canales disponibles
+    - dónde radicar
+    - cómo hacer una petición
+    - cómo contactarlos
+    - formas de contacto
+    - medios de comunicación
+    - vías de atención
+
+- intent: horarios_atencion
+  examples: |
+    - horarios de atención
+    - a qué horas atienden
+    - cuándo abren
+    - horario de trabajo
+    - horas de servicio
+    - cuándo puedo ir
+    - horarios presenciales
+    - hasta qué hora atienden
+    - desde qué hora abren
+    - horarios de oficina
+    - cuándo están abiertos
+
+- intent: linea_telefonica
+  examples: |
+    - línea telefónica
+    - número de teléfono
+    - teléfono de la defensoría
+    - línea nacional
+    - número gratuito
+    - teléfono de contacto
+    - teléfono institucional
+    - línea de atención
+    - número telefónico
+
+- intent: pedir_telefonos
+  examples: |
+    - números de teléfono
+    - contactos telefónicos
+    - teléfonos disponibles
+    - líneas de atención
+    - números para llamar
+    - todos los teléfonos
+    - directorio telefónico
+    - teléfonos de contacto
+
+- intent: pedir_correo
+  examples: |
+    - correo electrónico
+    - email de contacto
+    - correo de la defensoría
+    - dirección de correo
+    - email institucional
+    - correo oficial
+    - mail de contacto
+    - email oficial
+
+# PQRSDF y trámites
+
+- intent: consultar_proceso
+  examples: |
+    - consultar proceso
+    - consultar proceso con mi cédula
+    - seguimiento de mi proceso
+    - ver mi proceso con número de identificación
+    - consultar con cédula 1127390572
+    - cómo consultar un proceso
+
+
+- intent: que_es_pqrsdf
+  examples: |
+    - qué es PQRSDF
+    - qué significa PQRSDF
+    - peticiones quejas reclamos
+    - tipos de solicitudes
+    - cómo hacer una queja
+    - qué es una petición
+    - qué tipos de solicitudes puedo hacer
+    - explicame qué es PQRSDF
+    - significado de PQRSDF
+
+- intent: radicar_peticion
+  examples: |
+    - cómo radicar una petición
+    - quiero hacer una petición
+    - cómo presento una solicitud
+    - dónde radico mi caso
+    - quiero radicar
+    - necesito presentar una petición
+    - cómo hago una queja
+    - quiero poner una denuncia
+    - cómo hago una solicitud
+    - proceso para radicar
+    - pasos para radicar
+    - quiero radicar una queja
+    - necesito hacer una denuncia
+
+- intent: plazos_peticiones
+  examples: |
+    - cuánto tardan en responder
+    - plazos de respuesta
+    - tiempos de respuesta
+    - en cuántos días responden
+    - cuándo me van a contestar
+    - términos para responder
+    - cuánto se demoran
+    - tiempo de respuesta
+    - en cuánto tiempo responden
+
+- intent: pedir_plazos_peticion
+  examples: |
+    - plazos legales
+    - términos de ley
+    - tiempos establecidos
+    - plazos máximos
+    - cuánto tiempo tienen
+    - términos legales
+    - tiempos por ley
+    - plazos oficiales
+
+# Servicios específicos
+
+- intent: defensoria_publica
+  examples: |
+    - defensoría pública
+    - representación judicial
+    - abogado gratis
+    - defensor público
+    - asistencia jurídica
+    - abogado de oficio
+    - representación gratuita
+    - asistencia legal
+    - asesoría jurídica gratis
+    - representación legal
+
+- intent: defensor_publico_requisitos
+  examples: |
+    - requisitos defensor público
+    - cómo pedir abogado gratis
+    - quién puede acceder
+    - condiciones para defensor
+    - cómo solicito representación
+    - requisitos para abogado gratis
+    - condiciones para asesoría jurídica
+    - quién tiene derecho a defensor público
+
+- intent: litigio_defensorial
+  examples: |
+    - litigio defensorial
+    - acciones constitucionales
+    - tutelas
+    - acciones populares
+    - habeas corpus
+    - acciones de cumplimiento
+    - acción de tutela
+    - derechos de petición
+    - amparo constitucional
+
+- intent: mediacion_conciliacion
+  examples: |
+    - mediación
+    - conciliación
+    - resolver conflictos
+    - mediar un problema
+    - conciliar
+    - solucionar diferencias
+    - mediación de conflictos
+    - arreglo amigable
+    - solución pacífica
+
+- intent: sat_alertas_tempranas
+  examples: |
+    - alertas tempranas
+    - SAT
+    - sistema de alertas
+    - advertencias de riesgo
+    - alertas de seguridad
+    - prevención de riesgos
+    - sistema de alertas tempranas
+    - avisos de riesgo
+
+- intent: participacion_ciudadana
+  examples: |
+    - participación ciudadana
+    - control social
+    - rendición de cuentas
+    - participar en la gestión
+    - veeduría ciudadana
+    - control ciudadano
+    - participación social
+    - veedurías
+
+- intent: gestion_documental
+  examples: |
+    - gestión documental
+    - archivo de documentos
+    - manejo de información
+    - documentos institucionales
+    - archivo histórico
+    - administración de documentos
+    - organización de archivos
+
+# Poblaciones específicas
+
+- intent: derechos_infancia
+  examples: |
+    - derechos de los niños
+    - derechos de menores
+    - niñez y adolescencia
+    - protección infantil
+    - derechos de niñas y niños
+    - menores de edad
+    - derechos de los menores
+    - protección de menores
+    - derechos de la niñez
+
+- intent: denunciar_vulneracion_menor
+  examples: |
+    - denunciar maltrato infantil
+    - reportar abuso de menor
+    - vulneración derechos niño
+    - maltrato a niños
+    - abuso infantil
+    - violencia contra menores
+    - denuncia de maltrato
+    - reportar abuso infantil
+
+- intent: colombianos_exterior
+  examples: |
+    - colombianos en el exterior
+    - compatriotas en el extranjero
+    - colombianos fuera del país
+    - servicios para emigrantes
+    - ayuda a colombianos afuera
+    - migrantes colombianos
+    - connacionales en el exterior
+
+- intent: atencion_migrantes
+  examples: |
+    - atención migrantes
+    - extranjeros en colombia
+    - refugiados
+    - solicitud de refugio
+    - migrantes venezolanos
+    - personas extranjeras
+    - extranjeros en el país
+    - ayuda a migrantes
+
+# Otros servicios
+
+- intent: costo_servicios
+  examples: |
+    - cuánto cuesta
+    - valor de servicios
+    - precios
+    - tarifas
+    - cuánto cobran
+    - hay que pagar
+    - es gratis
+    - costo de servicios
+    - precio de atención
+    - valor de la consulta
+    - gratuito o pago
+
+- intent: no_intermediarios
+  examples: |
+    - intermediarios
+    - me pidieron dinero
+    - pagar por el servicio
+    - gestores
+    - terceros que cobran
+    - tramitadores
+    - alguien me pidió plata
+    - cobraron por el servicio
+
+- intent: trato_digno
+  examples: |
+    - trato digno
+    - atención respetuosa
+    - buen trato
+    - carta de trato digno
+    - atención de calidad
+    - atención respetuosa
+    - trato adecuado
+
+- intent: enfoque_diferencial
+  examples: |
+    - enfoque diferencial
+    - atención preferencial
+    - poblaciones vulnerables
+    - grupos étnicos
+    - personas con discapacidad
+    - adultos mayores
+    - atención especial
+    - grupos minoritarios
+
+- intent: privacidad_datos
+  examples: |
+    - privacidad
+    - protección datos
+    - confidencialidad
+    - reserva de información
+    - manejo de datos personales
+    - seguridad de datos
+    - protección de información
+
+- intent: organigrama
+  examples: |
+    - organigrama
+    - estructura organizacional
+    - dependencias
+    - oficinas
+    - quién es quién
+    - organización interna
+    - estructura institucional
+    - jerarquía organizacional
+
+# Fallbacks y escalamiento
+
+- intent: out_of_scope
+  examples: |
+    - facturación
+    - necesito una factura
+    - comprar productos
+    - servicios comerciales
+    - ventas
+    - marketing
+    - publicidad
+    - inversiones
+    - negocios
+    - préstamos
+
+- intent: hablar_con_humano
+  examples: |
+    - quiero hablar con una persona
+    - necesito un humano
+    - comunicarme con alguien
+    - hablar con funcionario
+    - atención personalizada
+    - persona real
+    - agente humano
+    - operador
+    - representante
+    - quiero hablar con alguien
+    - me comunicas con una persona
+    - hablar con un funcionario
+
+- intent: faq/participacion_que_es
+  examples: |
+    - ¿qué es la participación ciudadana?
+    - define participación ciudadana
+    - en qué consiste la participación ciudadana
+
+- intent: faq/participacion_mecanismos_que_son
+  examples: |
+    - ¿qué son los mecanismos de participación?
+    - mecanismos de participación ciudadana definición
+
+- intent: faq/participacion_mecanismos_lista
+  examples: |
+    - ¿cuáles son los mecanismos de participación?
+    - lista de mecanismos de participación ciudadana
+
+- intent: faq/infancia_derechos
+  examples: |
+    - derechos más relevantes de la infancia
+
+- intent: faq/infancia_reportar_vulneracion
+  examples: |
+    - dónde reporto la vulneración de un derecho a un menor
+    - denunciar vulneración de derechos de un niño
+
+- intent: faq/gestion_documental_que_es
+  examples: |
+    - qué es gestión documental
+    - en qué consiste el programa de gestión documental
+
+- intent: faq/pqrsdf_como_presentar
+  examples: |
+    - cómo presento una pqrsdf
+    - dónde radicar quejas o peticiones
+
+- intent: faq/defensoria_que_es
+  examples: |
+    - qué es la defensoría del pueblo
+    - función de la defensoría del pueblo
+
+- intent: faq/defensoria_funcion_principal
+  examples: |
+    - cuál es la función principal de la defensoría
+
+- intent: faq/defensoria_autonomia
+  examples: |
+    - la defensoría hace parte del gobierno
+    - la defensoría es del gobierno
+
+- intent: faq/servicios_que_presta
+  examples: |
+    - qué servicios presta la defensoría
+    - qué trámites puedo hacer en la defensoría
+
+- intent: faq/contacto_lineas
+  examples: |
+    - líneas de atención defensoría
+    - cómo me comunico con la defensoría
+
+- intent: faq/publicaciones_donde
+  examples: |
+    - dónde consultar publicaciones de la defensoría
+    - informes y boletines defensoría
+
+- intent: faq/alertas_tempranas_que_son
+  examples: |
+    - qué es una alerta temprana
+    - cómo funciona el SAT de la defensoría
+
+- intent: menu
+  examples: |
+    - menú
+    - volver al menú
+    - inicio
+    - empezar
+
+- intent: faq_menu
+  examples: |
+    - ver preguntas frecuentes
+    - preguntas frecuentes
+    - faq
+    - tengo una pregunta
+
+- intent: hablar_con_humano
+  examples: |
+    - quiero hablar con un asesor
+    - comunicarme con una persona
+    - que me llamen
+    - necesito contacto humano
+
+- intent: dar_telefono
+  examples: |
+    - mi número es [3204567890](telefono)
+    - [6013456789](telefono)
+    - [3001234567](telefono)
+    - [3150001122](telefono)
+    - 6013456789
+    - +57 300 111 2233
+    - 320-111-2233
+    - Sebastian 3138447735
+    - mi número es 3204567890
+
+- regex: telefono
+  examples: |
+    - (?:(?:\+?57)\s*)?(?:3\d{9}|\d{7,10})

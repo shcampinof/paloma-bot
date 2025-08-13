@@ -1,0 +1,382 @@
+version: "3.1"
+
+rules:
+
+# ========== SMALL TALK ==========
+- rule: regla para saludo y mostrar menú
+  steps:
+  - intent: saludar
+  - action: utter_saludo
+  - action: utter_menu_principal
+
+- rule: Responder a despedida
+  steps:
+  - intent: despedirse
+  - action: utter_despedida
+
+- rule: Responder agradecimiento
+  steps:
+  - intent: agradecer
+  - action: utter_agradecimiento
+
+- rule: Dar información general
+  steps:
+  - intent: pedir_informacion
+  - action: utter_pedir_informacion
+
+- rule: Preguntar cómo está
+  steps:
+  - intent: preguntar_estado
+  - action: utter_preguntar_estado
+
+- rule: Usuario responde bien
+  steps:
+  - intent: responder_bien
+  - action: utter_responder_bien
+
+- rule: Usuario responde mal
+  steps:
+  - intent: responder_mal
+  - action: utter_responder_mal
+
+
+
+  # Handoff a humano → pedir datos
+- rule: Handoff → contacto_form
+  steps:
+  - intent: hablar_con_humano
+  - action: utter_handoff_humano
+  - action: action_handoff
+  - action: contacto_form
+  - active_loop: contacto_form
+
+
+- rule: Submit contacto_form
+  condition:
+  - active_loop: contacto_form
+  steps:
+  - action: contacto_form
+  - active_loop: null
+  - action: utter_handoff_ok   # mensaje de cierre/derivación
+  - action: action_reset_pqrs_slots   # ← limpia los slots
+
+
+# Iniciar PQRSDF
+- rule: Iniciar PQRSDF
+  steps:
+  - intent: radicar_pqrsdf
+  - action: pqrsdf_form
+  - active_loop: pqrsdf_form
+
+# ====== PQRSDF: SUBMIT ÚNICO ======
+- rule: Submit pqrsdf_form
+  condition:
+    - active_loop: pqrsdf_form
+  steps:
+    - action: pqrsdf_form
+    - active_loop: null
+    - slot_was_set:
+        - requested_slot: null
+    # (Opcional) muestra un resumen y luego confirma
+    - action: utter_pqrsdf_resumen      # <- QUÍTALO si no existe esa utter
+    - action: utter_confirmar_pqrs
+
+
+# ========== INFORMACIÓN INSTITUCIONAL ==========
+- rule: Información sobre misión
+  steps:
+  - intent: mision
+  - action: utter_mision
+
+- rule: Información sobre visión
+  steps:
+  - intent: vision
+  - action: utter_vision
+
+- rule: Información sobre funciones
+  steps:
+  - intent: funciones
+  - action: utter_funciones
+
+- rule: Información sobre principios y valores
+  steps:
+  - intent: principios_valores
+  - action: utter_principios_valores
+
+- rule: Información sobre código de integridad
+  steps:
+  - intent: codigo_integridad
+  - action: utter_codigo_integridad
+
+- rule: Información sobre canales
+  steps:
+  - intent: canales_atencion
+  - action: utter_canales_atencion
+
+- rule: Información sobre horarios
+  steps:
+  - intent: horarios_atencion
+  - action: utter_horarios_atencion
+
+#  Contacto directo
+- rule: Información línea telefónica
+  steps:
+  - intent: linea_telefonica
+  - action: utter_linea_telefonica
+
+- rule: Pedir teléfonos
+  steps:
+  - intent: pedir_telefonos
+  - action: utter_pedir_telefonos
+
+- rule: Pedir correo
+  steps:
+  - intent: pedir_correo
+  - action: utter_pedir_correo
+
+- rule: Pedir ayuda
+  steps:
+    - intent: pedir_ayuda
+    - action: utter_pedir_ayuda
+
+# ========== PQRSDF Y TRÁMITES ==========
+- rule: Explicar qué es PQRSDF
+  steps:
+  - intent: que_es_pqrsdf
+  - action: utter_que_es_pqrsdf
+
+- rule: Iniciar radicación de petición
+  condition:
+  - active_loop: null
+  steps:
+  - intent: radicar_peticion
+  - action: pqrsdf_form
+  - active_loop: pqrsdf_form
+
+
+- rule: Información sobre plazos
+  steps:
+  - intent: plazos_peticiones
+  - action: utter_plazos_peticion
+
+- rule: Información sobre plazos (variante)
+  steps:
+  - intent: pedir_plazos_peticion
+  - action: utter_plazos_peticion
+
+
+# ========== SERVICIOS ESPECÍFICOS ==========
+- rule: Información Defensoría Pública
+  steps:
+  - intent: defensoria_publica
+  - action: utter_defensoria_publica
+
+- rule: Requisitos Defensor Público
+  steps:
+  - intent: defensor_publico_requisitos
+  - action: utter_defensoria_publica
+
+- rule: Consultar por id (proceso)
+  condition:
+  - active_loop: null
+  steps:
+  - intent: consultar_proceso
+  - slot_was_set:
+      - numero_identificacion: null
+  - action: consulta_proceso_form
+  - active_loop: consulta_proceso_form
+
+- rule: Enviar consulta por cédula (proceso)
+  condition:
+  - active_loop: consulta_proceso_form
+  steps:
+  - action: consulta_proceso_form
+  - active_loop: null
+  - action: action_lookup_cedula
+
+- rule: Información litigio defensorial
+  steps:
+  - intent: litigio_defensorial
+  - action: utter_pedir_informacion
+
+- rule: Información mediación y conciliación
+  steps:
+  - intent: mediacion_conciliacion
+  - action: utter_pedir_informacion
+
+- rule: Información SAT alertas tempranas
+  steps:
+  - intent: sat_alertas_tempranas
+  - action: utter_pedir_informacion
+
+- rule: Información participación ciudadana
+  steps:
+  - intent: participacion_ciudadana
+  - action: utter_pedir_informacion
+
+- rule: Información gestión documental
+  steps:
+  - intent: gestion_documental
+  - action: utter_pedir_informacion
+
+- rule: Información costo servicios
+  steps:
+  - intent: costo_servicios
+  - action: utter_costo_servicios
+
+- rule: Información intermediarios
+  steps:
+  - intent: no_intermediarios
+  - action: utter_costo_servicios
+
+- rule: Información trato digno
+  steps:
+  - intent: trato_digno
+  - action: utter_pedir_informacion
+
+- rule: Información enfoque diferencial
+  steps:
+  - intent: enfoque_diferencial
+  - action: utter_pedir_informacion
+
+- rule: Información privacidad de datos
+  steps:
+  - intent: privacidad_datos
+  - action: utter_pedir_informacion
+
+- rule: Información organigrama
+  steps:
+  - intent: organigrama
+  - action: utter_pedir_informacion
+
+
+# ========== POBLACIONES ESPECÍFICAS ==========
+- rule: Derechos de la infancia
+  steps:
+  - intent: derechos_infancia
+  - action: utter_derechos_infancia
+
+- rule: Información colombianos en el exterior
+  steps:
+  - intent: colombianos_exterior
+  - action: utter_pedir_informacion
+
+- rule: Información atención migrantes
+  steps:
+  - intent: atencion_migrantes
+  - action: utter_pedir_informacion
+
+
+# ========== FAQ ==========
+# El ResponseSelector despacha utter_faq/<subintent>
+- rule: Responder FAQs
+  steps:
+  - intent: faq
+  - action: utter_faq
+
+
+# ========== FALLBACKS Y ESCALAMIENTO ==========
+- rule: Fallback por baja confianza NLU
+  steps:
+  - intent: nlu_fallback
+  - action: action_default_fallback
+
+- rule: Fuera de alcance
+  condition:
+  - active_loop: null
+  steps:
+  - intent: out_of_scope
+  - action: utter_out_of_scope
+
+# ====== Handoff: ÚNICA ======
+- rule: Escalar a humano (única)
+  condition:
+    - active_loop: null
+  steps:
+    - intent: hablar_con_humano
+    - action: utter_handoff_humano
+    - action: action_handoff
+    - action: contacto_form
+    - active_loop: contacto_form
+
+    
+- rule: Negar tras fuera de alcance → menú
+steps:
+- action: utter_out_of_scope
+- intent: negar
+- action: utter_menu_principal
+
+
+# ========== REGLAS DE INTERRUPCIÓN ==========
+- rule: Permitir saludo durante formulario
+  condition:
+  - active_loop: pqrsdf_form
+  steps:
+  - intent: saludar
+  - action: utter_saludo
+  - action: pqrsdf_form
+  - active_loop: pqrsdf_form
+
+- rule: Permitir agradecimiento durante formulario
+  condition:
+  - active_loop: pqrsdf_form
+  steps:
+  - intent: agradecer
+  - action: utter_agradecimiento
+  - action: pqrsdf_form
+  - active_loop: pqrsdf_form
+
+
+# Cierre del form de contacto
+- rule: Fin contacto_form
+  condition:
+    - active_loop: contacto_form
+  steps:
+    - action: contacto_form
+    - active_loop: null
+    - action: utter_confirmar_llamada
+    - action: utter_menu_principal
+
+
+# Permitir cortes amables dentro del form sin romperlo
+- rule: Saludo dentro de contacto_form
+  condition:
+    - active_loop: contacto_form
+  steps:
+    - intent: saludar
+    - action: utter_saludo
+    - action: contacto_form
+    - active_loop: contacto_form
+
+- rule: Gracias dentro de contacto_form
+  condition:
+    - active_loop: contacto_form
+  steps:
+    - intent: agradecer
+    - action: utter_agradecimiento
+    - action: contacto_form
+    - active_loop: contacto_form
+
+# Menú explícito (cuando el usuario pida "menú", "inicio", etc.)
+- rule: Volver al menú
+  condition:
+    - active_loop: null
+  steps:
+    - intent: menu
+    - action: utter_menu_principal
+
+# Abrir FAQs con intro (para que luego el usuario pregunte y dispare el ResponseSelector)
+- rule: Abrir FAQs
+  condition:
+    - active_loop: null
+  steps:
+    - intent: faq_menu
+    - action: utter_faq_intro
+
+# Capturar teléfono fuera de cualquier formulario (opcional pero silencia el warning)
+- rule: Capturar teléfono fuera de formulario
+  condition:
+    - active_loop: null
+  steps:
+    - intent: dar_telefono
+    - action: utter_confirmar_llamada

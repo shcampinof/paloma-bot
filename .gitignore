@@ -1,0 +1,35 @@
+﻿# Python / Rasa caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.rasa/
+.cache/
+
+# Entornos virtuales
+rasa_env/
+env/
+venv/
+.venv/
+
+# IDE/Editor
+.vscode/
+.idea/
+
+# Logs y artefactos
+*.log
+
+# Modelos y artefactos pesados
+models/*
+!models/.gitkeep
+*.tar.gz
+
+# Node (si existiera)
+node_modules/
+
+# Archivos de sistema / VCS
+.DS_Store
+Thumbs.db
+.git/
+.github/
+.gitattributes

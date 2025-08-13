@@ -1,0 +1,326 @@
+version: "3.1"
+
+stories:
+
+# ========== HISTORIAS DE CONVERSACIÓN BÁSICA ==========
+
+- story: saludo y menú de opciones
+  steps:
+    - intent: saludar
+    - action: utter_saludo
+    - action: utter_menu_principal
+
+- story: Saludo y solicitud de información básica
+  steps:
+  - intent: saludar
+  - action: utter_saludo
+  - action: utter_menu_principal
+  - intent: preguntar_estado
+  - action: utter_preguntar_estado
+  - intent: responder_bien
+  - action: utter_responder_bien
+
+- story: Responder mal y ofrecer ayuda
+  steps:
+  - intent: preguntar_estado
+  - action: utter_preguntar_estado  
+  - intent: responder_mal
+  - action: utter_responder_mal
+
+- story: agradecer
+  steps:
+  - intent: agradecer
+  - action: utter_agradecimiento
+
+# ✅ CORREGIDO: Cambiar utter_informacion por utter_pedir_informacion
+- story: pedir información
+  steps:
+  - intent: pedir_informacion
+  - action: utter_pedir_informacion
+
+- story: Preguntar_mision
+  steps:
+  - intent: mision
+  - action: utter_mision
+
+- story: Conversación sobre canales y horarios
+  steps:
+  - intent: canales_atencion
+  - action: utter_canales_atencion
+  - intent: horarios_atencion
+  - action: utter_horarios_atencion
+  - intent: agradecer
+  - action: utter_agradecimiento
+  - intent: despedirse
+  - action: utter_despedida
+
+# ========== HISTORIAS DE PQRSDF ==========
+
+- story: Usuario quiere radicar petición - flujo completo
+  steps:
+  - intent: saludar
+  - action: utter_saludo
+  - action: utter_menu_principal     
+  - intent: radicar_peticion
+  - action: pqrsdf_form
+  - active_loop: pqrsdf_form
+  - slot_was_set:
+    - requested_slot: tipo_pqrs
+  - intent: inform # 
+  - slot_was_set:
+    - tipo_pqrs: peticion
+  - slot_was_set:
+    - requested_slot: nombre_completo
+  - intent: inform # ← 
+  - slot_was_set:
+    - nombre_completo: Juan Pérez
+  - slot_was_set:
+    - requested_slot: numero_identificacion
+  - intent: inform # 
+  - slot_was_set:
+    - numero_identificacion: "12345678"
+  - slot_was_set:
+    - requested_slot: correo_contacto
+  - intent: inform # 
+  - slot_was_set:
+    - correo_contacto: juan@email.com
+  - slot_was_set:
+    - requested_slot: telefono_contacto
+  - intent: inform # 
+  - slot_was_set:
+    - telefono_contacto: "3001234567"
+  - slot_was_set:
+    - requested_slot: descripcion_caso
+  - intent: inform # 
+  - slot_was_set:
+    - descripcion_caso: "Problema con atención médica"
+  - slot_was_set:
+    - requested_slot: medio_notificacion
+  - intent: inform 
+  - slot_was_set:
+    - medio_notificacion: correo
+  - slot_was_set:
+    - requested_slot: null
+  - active_loop: null
+  - action: utter_confirmar_pqrs
+
+- story: Consultar proceso (happy path)
+  steps:
+    - intent: consultar_proceso
+    - action: consulta_proceso_form
+    - active_loop: consulta_proceso_form
+    # El usuario responde con la cédula; NO es necesario poner un intent aquí.
+    - active_loop: null
+    - action: action_lookup_cedula
+
+- story: Usuario interrumpe formulario para preguntar
+  steps:
+  - intent: radicar_peticion
+  - action: pqrsdf_form
+  - active_loop: pqrsdf_form
+  - intent: plazos_peticiones # Interrumpe para preguntar
+  - action: utter_plazos_peticion
+  - action: pqrsdf_form # Continúa formulario
+  - active_loop: pqrsdf_form
+
+- story: Usuario abandona formulario
+  steps:
+  - intent: radicar_peticion
+  - action: pqrsdf_form
+  - active_loop: pqrsdf_form
+  - intent: despedirse # Usuario se va
+  - action: utter_despedida
+  - active_loop: null
+
+# ========== HISTORIAS DE SERVICIOS ESPECÍFICOS ==========
+
+- story: Consulta sobre Defensoría Pública
+  steps:
+  - intent: pedir_ayuda
+  - action: utter_pedir_ayuda
+  - intent: defensoria_publica
+  - action: utter_defensoria_publica
+  - intent: defensor_publico_requisitos
+  - action: utter_defensoria_publica
+  - intent: costo_servicios
+  - action: utter_costo_servicios
+  - intent: agradecer
+  - action: utter_agradecimiento
+
+- story: Pregunta sobre costos y servicios gratuitos
+  steps:
+  - intent: costo_servicios
+  - action: utter_costo_servicios
+  - intent: no_intermediarios
+  - action: utter_costo_servicios
+  - intent: afirmar
+  - action: utter_agradecimiento
+
+# ========== HISTORIAS DE POBLACIONES VULNERABLES ==========
+
+- story: Consulta sobre derechos de menores
+  steps:
+  - intent: derechos_infancia
+  - action: utter_derechos_infancia
+  - intent: denunciar_vulneracion_menor
+  - action: utter_radicar_peticion # Los dirige a radicar
+  - intent: afirmar
+  - action: pqrsdf_form
+  - active_loop: pqrsdf_form
+
+- story: Emergencia con menor - escalamiento rápido
+  steps:
+  - intent: denunciar_vulneracion_menor
+  - action: utter_derechos_infancia
+  - intent: hablar_con_humano
+  - action: utter_handoff_humano
+  - action: action_handoff
+  - action: contacto_form
+  - active_loop: contacto_form
+
+- story: Ayudar al usuario
+  steps:
+  - intent: pedir_ayuda
+  - action: utter_pedir_ayuda
+
+# ========== HISTORIAS DE ESCALAMIENTO ==========
+
+- story: Usuario frustrado quiere hablar con humano
+  steps:
+  - intent: pedir_ayuda
+  - action: utter_pedir_ayuda
+  - intent: out_of_scope
+  - action: utter_out_of_scope
+  - intent: hablar_con_humano
+  - action: utter_handoff_humano
+  - action: action_handoff
+  - action: contacto_form
+  - active_loop: contacto_form
+
+- story: Múltiples fallbacks llevan a escalamiento (determinista)
+  steps:
+  - intent: nlu_fallback
+  - action: action_default_fallback
+  - intent: nlu_fallback
+  - action: action_default_fallback
+  - intent: hablar_con_humano
+  - action: utter_handoff_humano
+  - action: action_handoff
+  - action: contacto_form
+  - active_loop: contacto_form
+
+# ========== HISTORIAS DE HAPPY PATH ==========
+
+- story: Usuario satisfecho con información completa
+  steps:
+  - intent: saludar
+  - action: utter_saludo
+  - action: utter_menu_principal     
+  - intent: canales_atencion
+  - action: utter_canales_atencion
+  - intent: horarios_atencion
+  - action: utter_horarios_atencion
+  - intent: que_es_pqrsdf
+  - action: utter_que_es_pqrsdf
+  - intent: plazos_peticiones
+  - action: utter_plazos_peticion
+  - intent: agradecer
+  - action: utter_agradecimiento
+  - intent: despedirse
+  - action: utter_despedida
+
+# ========== HISTORIAS DE UNHAPPY PATH ==========
+
+- story: Usuario con problema específico no resuelto (determinista)
+  steps:
+  - intent: pedir_ayuda
+  - action: utter_pedir_ayuda
+  - intent: out_of_scope
+  - action: utter_out_of_scope
+  - intent: hablar_con_humano
+  - action: utter_handoff_humano
+  - action: action_handoff
+  - action: contacto_form
+  - active_loop: contacto_form
+
+- story: Usuario confundido sobre trámites
+  steps:
+  - intent: pedir_informacion
+  - action: utter_pedir_informacion
+  - intent: que_es_pqrsdf
+  - action: utter_que_es_pqrsdf
+  - intent: afirmar # Ahora entiende
+  - action: utter_agradecimiento
+
+# ========== HISTORIAS CON CONTEXTO EMOCIONAL ==========
+
+- story: Usuario en situación difícil
+  steps:
+  - intent: saludar
+  - action: utter_saludo
+  - action: utter_menu_principal     
+  - intent: responder_mal
+  - action: utter_responder_mal
+  - intent: derechos_infancia
+  - action: utter_derechos_infancia
+  - intent: radicar_peticion
+  - action: pqrsdf_form
+  - active_loop: pqrsdf_form
+
+- story: Usuario agradecido por el servicio
+  steps:
+  - intent: defensoria_publica
+  - action: utter_defensoria_publica
+  - intent: costo_servicios
+  - action: utter_costo_servicios
+  - intent: agradecer
+  - action: utter_agradecimiento
+  - intent: responder_bien
+  - action: utter_responder_bien
+  - intent: despedirse
+  - action: utter_despedida
+
+# ========== HISTORIAS DE RECUPERACIÓN DE ERRORES ==========
+
+- story: Bot no entiende pero se recupera
+  steps:
+  - intent: nlu_fallback
+  - action: action_default_fallback
+  - intent: pedir_ayuda
+  - action: utter_pedir_ayuda
+  - intent: canales_atencion
+  - action: utter_canales_atencion
+  - intent: agradecer
+  - action: utter_agradecimiento
+
+# ========== HISTORIAS PARA INTENTS FALTANTES ==========
+
+- story: Usuario pregunta por funciones
+  steps:
+  - intent: funciones
+  - action: utter_funciones
+
+- story: Usuario pregunta por principios
+  steps:
+  - intent: principios_valores
+  - action: utter_principios_valores
+
+- story: Usuario pregunta por código de integridad
+  steps:
+  - intent: codigo_integridad
+  - action: utter_codigo_integridad
+
+- story: Usuario pide teléfonos
+  steps:
+  - intent: pedir_telefonos
+  - action: utter_pedir_telefonos
+
+- story: Usuario pide línea telefónica
+  steps:
+  - intent: linea_telefonica
+  - action: utter_linea_telefonica
+
+- story: Usuario pide correo
+  steps:
+  - intent: pedir_correo
+  - action: utter_pedir_correo

@@ -1,0 +1,474 @@
+version: '3.1'
+
+intents:
+  # Intents básicos
+  - saludar
+  - despedirse
+  - agradecer
+  - pedir_ayuda
+  - pedir_informacion
+  - preguntar_estado
+  - responder_bien
+  - responder_mal
+  - afirmar
+  - negar
+  - inform 
+
+  # Intents específicos de la Defensoría
+  - mision
+  - vision
+  - funciones
+  - principios_valores
+  - codigo_integridad
+  - canales_atencion
+  - horarios_atencion
+  - linea_telefonica
+  - pedir_telefonos
+  - pedir_correo
+
+  # PQRSDF y trámites
+  - que_es_pqrsdf
+  - radicar_peticion
+  - plazos_peticiones
+  - pedir_plazos_peticion
+
+  # Servicios específicos
+  - defensoria_publica
+  - defensor_publico_requisitos
+  - litigio_defensorial
+  - mediacion_conciliacion
+  - sat_alertas_tempranas
+  - participacion_ciudadana
+  - gestion_documental
+
+  # Poblaciones específicas
+  - derechos_infancia
+  - denunciar_vulneracion_menor
+  - colombianos_exterior
+  - atencion_migrantes
+
+  # Otros
+  - costo_servicios
+  - no_intermediarios
+  - trato_digno
+  - enfoque_diferencial
+  - privacidad_datos
+  - organigrama
+  - out_of_scope
+  - hablar_con_humano
+  - consultar_proceso
+  - menu
+  - faq_menu
+  - dar_telefono     
+
+  - faq   # retrieval intent para todas las FAQs
+
+
+entities: #piezas específicas de información que extraes del texto (p. ej., tipo_servicio)
+  - ciudad
+  - departamento
+  - tipo_pqrs
+  - canal
+  - tipo_servicio
+  - nombre
+  - numero_identificacion
+  - correo_electronico
+  - telefono
+
+slots: #  la “memoria” del bot (variables) donde guardas datos durante la conversación; puedes llenarlos directo “desde el texto” (from_text) u otras fuentes. 
+  
+  tipo_pqrs:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_text
+        conditions:
+          - active_loop: pqrsdf_form
+            requested_slot: tipo_pqrs
+
+
+  numero_identificacion:
+    type: text
+    influence_conversation: false
+    mappings:
+      # Cuando lo pide el form de consulta de proceso
+      - type: from_text
+        conditions:
+          - active_loop: consulta_proceso_form
+            requested_slot: numero_identificacion
+      # Cuando lo pide el form de PQRSDF
+      - type: from_text
+        conditions:
+          - active_loop: pqrsdf_form
+            requested_slot: numero_identificacion
+
+  nombre_contacto:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_text
+        conditions:
+          - active_loop: contacto_form
+            requested_slot: nombre_contacto
+
+  telefono_contacto:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_entity
+        entity: telefono
+        conditions:
+          - active_loop: pqrsdf_form
+            requested_slot: telefono_contacto
+      - type: from_text
+        conditions:
+          - active_loop: pqrsdf_form
+            requested_slot: telefono_contacto
+  
+  ciudad:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_entity
+        entity: ciudad
+
+  departamento:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_entity
+        entity: departamento
+
+  canal_preferido:
+    type: categorical
+    values:
+      - presencial
+      - virtual
+      - telefonico
+      - escrito
+    influence_conversation: false
+    mappings:
+      - type: from_entity
+        entity: canal
+
+  # Slots para el formulario PQRSDF
+
+  nombre_completo:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_text
+        conditions:
+          - active_loop: pqrsdf_form
+            requested_slot: nombre_completo
+
+  correo_contacto:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_text
+        conditions:
+          - active_loop: pqrsdf_form
+            requested_slot: correo_contacto
+
+  descripcion_caso:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_text
+        conditions:
+          - active_loop: pqrsdf_form
+            requested_slot: descripcion_caso
+
+  medio_notificacion:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_text
+        conditions:
+          - active_loop: pqrsdf_form
+            requested_slot: medio_notificacion
+
+responses:
+
+  utter_saludo:
+    - text: "¡Hola! Soy el asistente virtual de la Defensoría del Pueblo de Colombia. ¿Cómo te encuentras el día de hoy?"
+
+  utter_menu_principal:
+    - text: "¿En qué puedo ayudarte hoy?"
+      buttons:
+        - title: "CONSULTAR UN PROCESO"     # ← SIN numeración y va primero
+          payload: "/consultar_proceso" 
+        - title: "1) Radicar o consultar PQRSDF"
+          payload: /menu_pqrsdf
+        - title: "2) Servicios a la ciudadanía"
+          payload: /menu_servicios
+        - title: "3) Rutas por población"
+          payload: /menu_poblaciones
+        - title: "4) Canales y horarios"
+          payload: /menu_canales
+        - title: "5) Conoce la Defensoría"
+          payload: /menu_entidad
+        - title: "6) Trato digno y privacidad"
+          payload: /menu_trato
+
+  utter_ask_nombre_contacto:
+  - text: "Por favor, indica tu **nombre completo**."
+
+  utter_ask_telefono_contacto:
+  - text: "Tú **número de contacto** por favor (solo dígitos, sin espacios)."
+
+  utter_handoff_ok:
+    - text: "Gracias. Un asesor te contactará pronto."
+  utter_ask_nombre_completo:
+    - text: "Indica tu nombre completo."
+  utter_ask_correo_contacto:
+    - text: "Correo electrónico de contacto."
+  utter_ask_telefono_contacto_pqrs:
+    - text: "Teléfono de contacto (solo dígitos)."
+  utter_ask_descripcion_caso:
+    - text: "Describe tu caso (mínimo 10 caracteres)."
+  utter_pqrsdf_resumen:
+    - text: "¡Solicitud registrada! Te enviaremos confirmación por el medio indicado."
+  utter_confirmar_llamada:
+  - text: "¡Listo! Un funcionario te contactará al **{telefono_contacto}**. También registré tu nombre: **{nombre_contacto}**."
+
+  utter_despedida:
+    - text: "Gracias por contactar la Defensoría del Pueblo. ¡Que tengas un buen día! Recuerda que estamos aquí para proteger tus derechos."
+
+  utter_agradecimiento:
+    - text: "¡Con gusto! Estoy aquí para ayudarte con información sobre la Defensoría del Pueblo."
+
+  utter_pedir_ayuda:
+    - text: "Estoy aquí para ayudarte. Puedo brindarte información sobre:\n• Servicios de la Defensoría\n• Cómo radicar una PQRSDF\n• Derechos humanos\n• Canales de atención\n¿Sobre qué te gustaría saber más?"
+
+  utter_pedir_informacion:
+    - text: "Puedo brindarte información sobre los servicios y trámites de la Defensoría del Pueblo. ¿Qué te gustaría saber específicamente?"
+
+  utter_preguntar_estado:
+    - text: "¡Estoy muy bien, gracias por preguntar! 😊 ¿En qué puedo ayudarte hoy?"
+    - text: "¡Todo perfecto por aquí! ¿Cómo puedo orientarte?"
+    - text: "¡Excelente! Listo para ayudarte. ¿Qué necesitas saber?"
+
+  utter_responder_bien:
+    - text: "¡Qué bueno escuchar eso! Estoy listo para ayudarte en lo que necesites sobre la Defensoría del Pueblo."
+
+  utter_responder_mal:
+    - text: "Lo siento mucho por lo que estás pasando. Si necesitas ayuda relacionada con vulneración de derechos, puedo orientarte sobre los servicios de la Defensoría."
+
+  utter_funciones:
+    - text: "**Funciones principales del Defensor del Pueblo:**\n• Promover y divulgar derechos humanos\n• Proteger y defender derechos\n• Interponer acciones judiciales\n• Orientar y asesorar\n• Emitir conceptos y recomendaciones"
+
+  utter_principios_valores:
+    - text: "**Principios y valores:**\n• Autonomía e independencia\n• Imparcialidad\n• Equidad\n• Eficacia\n• Transparencia\n• Participación\n• Responsabilidad social"
+
+  utter_codigo_integridad:
+    - text: "El **Código de Integridad** establece los valores y principios éticos que orientan el comportamiento de todos los servidores de la Defensoría del Pueblo."
+
+  utter_linea_telefonica:
+    - text: "**Líneas telefónicas:**\n📞 **Nacional gratuita:** 01 8000 914 814\n📞 **PBX Bogotá:** (601) 314 40 00\n*Atención de lunes a viernes en horario laboral*"
+
+  utter_pedir_telefonos:
+    - text: "**Números telefónicos disponibles:**\n• Línea nacional: 01 8000 914 814\n• PBX Bogotá: (601) 314 40 00\n• Para sedes regionales específicas, consulta nuestro directorio en www.defensoria.gov.co"
+
+  utter_pedir_correo:
+    - text: "**Contactos por correo:**\n📧 Información general: defensoria@defensoria.gov.co\n📧 PQRSDF: pqrsdf@defensoria.gov.co\n📧 También puedes contactar sedes específicas a través del portal web"
+
+  utter_mision:
+    - text: "**Misión de la Defensoría del Pueblo:**\n\nSomos la institución del Estado colombiano responsable de impulsar la efectividad de los derechos humanos mediante:\n• Promover, ejercer y divulgar los derechos humanos\n• Proteger y defender los derechos humanos\n• Fomentar la observancia del derecho internacional humanitario\n• Orientar y asesorar en el ejercicio de derechos\n• Proveer acceso a la justicia"
+
+  utter_vision:
+    - text: "**Visión 2028:**\n\nSer la voz líder, legítima e independiente que, con el territorio en la base de su acción, tiende puentes en la diversidad y genera confianza, contribuyendo a transformar derechos en realidades."
+
+  utter_canales_atencion:
+    - text: "**Canales de atención disponibles:**\n\n📍 **Presencial:** Puntos de atención a nivel nacional\n💻 **Virtual:** www.defensoria.gov.co (24/7 para radicar)\n📞 **Telefónico:** 01 8000 914 814 (líneas fijas) / PBX Bogotá: (601) 314 40 00\n📝 **Escrito:** Ventanillas de radicación y buzones PQRSDF\n\n*Las solicitudes se gestionan en días hábiles*"
+
+  utter_horarios_atencion:
+    - text: "**Horarios generales:** \n • Atención presencial: Lunes a viernes, generalmente de 8:00 a.m. a 5:00 p.m.\n• Portal web: Disponible 24/7 para radicar peticiones\n• Los horarios pueden variar por sede regional\n\n¿Necesitas el horario específico de alguna ciudad?"
+
+  utter_que_es_pqrsdf:
+    - text: >
+        Las PQRSDF son los mecanismos para comunicarte con la Defensoría:
+        Peticiones, Quejas, Reclamos, Sugerencias, Denuncias y Felicitaciones.
+        ¿Qué deseas hacer?
+      buttons:
+        - title: Radicar una solicitud
+          payload: /radicar_peticion
+        - title: Canales y horarios
+          payload: /canales_atencion
+        - title: Plazos de respuesta
+          payload: /pedir_plazos_peticion
+
+  utter_faq_intro:
+    - text: |
+        Escribe tu pregunta en lenguaje natural y te respondo al instante.
+        Ejemplos: 
+        • “¿Qué es la participación ciudadana?” 
+        • “¿Cómo presento una PQRSDF?”
+        • “¿Qué son las Alertas Tempranas?”
+
+  utter_ask_numero_identificacion:
+    - text: "Por favor, ingresa el **número de identificación** sin comas ni puntos (solo dígitos)."
+
+  utter_radicar_peticion:
+    - text: "**¿Cómo radicar una petición?**\n\n1. **Portal web:** www.defensoria.gov.co → 'Radique su petición aquí'\n2. **Presencial:** En cualquier punto de atención\n3. **Telefónico:** 01 8000 914 814\n4. **Escrito:** Ventanillas de correspondencia\n\n¿Te gustaría que te ayude a tomar los datos para orientarte?"
+
+  utter_plazos_peticion:
+    - text: "**Plazos de respuesta (días hábiles):**\n• Petición general: 15 días\n• Documentos/información: 10 días\n• Entre autoridades: 10 días\n• Congresistas: 5 días\n• Consultas: 30 días\n\nRecibirás número de radicado para hacer seguimiento."
+
+  utter_defensoria_publica:
+    - text: "**Defensoría Pública:** Representación judicial GRATUITA para personas en situación de vulnerabilidad económica.\n\n**Áreas:** Penal, civil, familia, laboral, administrativo, restitución de tierras.\n\n**Requisitos:** Imposibilidad económica y necesidad del proceso.\n\n¿Necesitas orientación para solicitar este servicio?"
+
+  utter_costo_servicios:
+    - text: "🆓 **TODOS los servicios de la Defensoría del Pueblo son GRATUITOS**\n\n❌ **NO requieres intermediarios**\n❌ **NO pagues a terceros**\n\nSi alguien te pide dinero por estos servicios, repórtalo inmediatamente."
+
+  utter_derechos_infancia:
+    - text: "**Derechos fundamentales de niñas, niños y adolescentes:**\n• Vida, salud y educación\n• Identidad y familia\n• Integridad personal y protección\n• Participación y libre expresión\n• Recreación y cultura\n\n¿Necesitas reportar una situación específica?"
+
+  utter_out_of_scope:
+    - text: "Puedo ayudarte con información sobre la Defensoría del Pueblo, sus servicios y trámites. Para consultas específicas fuera de mi conocimiento, te sugiero contactar directamente a la entidad."
+
+  utter_handoff_humano:
+    - text: "Te voy a conectar con un funcionario de la Defensoría del Pueblo para que pueda atenderte personalmente. Por favor mantén a la mano tus datos de contacto."
+
+  # Preguntas para el formulario
+  utter_ask_tipo_pqrs:
+  - text: "¿Qué tipo de solicitud deseas radicar?"
+    buttons:
+      - title: "Petición"
+        payload: "Petición"
+      - title: "Queja"
+        payload: "Queja"
+      - title: "Reclamo"
+        payload: "Reclamo"
+      - title: "Sugerencia"
+        payload: "Sugerencia"
+      - title: "Denuncia"
+        payload: "Denuncia"
+      - title: "Felicitación"
+        payload: "Felicitación"
+
+  utter_ask_medio_notificacion:
+  - text: "¿Cómo prefieres recibir la respuesta?"
+    buttons:
+      - title: "Por correo electrónico"
+        payload: "Correo"
+      - title: "Por teléfono"
+        payload: "Teléfono"
+      # Si realmente lo ofreces, deja esta. Si no, elimínala.
+      - title: "Notificación física"
+        payload: "Notificación física"
+
+  utter_confirmar_pqrs:
+    - text: "Perfecto. Con esta información podrás radicar tu solicitud a través del canal que prefieras. Recibirás un número de radicado y respuesta en los plazos legales establecidos."
+
+  utter_faq/participacion_que_es:
+    - text: |
+        La **participación ciudadana** es el derecho de las personas a intervenir en las decisiones públicas y en el uso de los recursos que afectan a su comunidad. Permite llevar propuestas y control a distintos niveles del Estado.
+        Política de participación: https://www.defensoria.gov.co/documents/20123/1259041/Politica-participacion-ciudadana2022.pdf/75108ff0-3399-7f2c-114e-f865b8b55f2c
+
+  utter_faq/participacion_mecanismos_que_son:
+    - text: |
+        Los **mecanismos de participación** materializan ese derecho y permiten a la ciudadanía intervenir en la conformación, ejercicio y control del poder político (planes, decisiones, seguimiento y control social).
+
+  utter_faq/participacion_mecanismos_lista:
+    - text: |
+        Principales mecanismos:
+        • Diagnóstico de necesidades
+        • Planeación y presupuesto participativo
+        • Consulta ciudadana
+        • Colaboración e innovación abierta
+        • Rendición de cuentas
+        • Control social
+        Más info: https://www.defensoria.gov.co/participacion-ciudadana
+
+  utter_faq/infancia_derechos:
+    - text: |
+        **Derechos relevantes de la niñez:** vida; integridad y protección; identidad; familia; salud; educación; libertad (asociación y reunión pacífica); debido proceso y resocialización; custodia, cuidado y alimentos; intimidad; información.
+
+  utter_faq/infancia_reportar_vulneracion:
+    - text: |
+        Si sospechas vulneración de derechos de un/a menor, repórtalo aquí:
+        http://eliseo.defensoria.gov.co/visionweb/cac2/web_preconsulta.php
+
+  utter_faq/gestion_documental_que_es:
+    - text: |
+        La **gestión documental** es el conjunto de actividades para planear, organizar, custodiar y disponer la documentación de la Entidad desde su creación hasta su destino final. Programa de Gestión Documental:
+        https://www.defensoria.gov.co/programa-gestion-documental
+
+  utter_faq/pqrsdf_como_presentar:
+    - text: |
+        Puedes presentar **PQRSDF** por:
+        • En línea (24/7) en www.defensoria.gov.co → Atención al Ciudadano
+        • Telefónico: Bogotá (601) 314 73 00, Línea gratuita 01 8000 914 814
+        • Presencial: oficinas de atención al ciudadano (ver directorio en el sitio web)
+        • Correspondencia
+        Te orientamos por todos los canales.
+
+  utter_faq/defensoria_que_es:
+  - text: |
+      La Defensoría del Pueblo es una entidad del Estado colombiano encargada de velar por la promoción, defensa y divulgación de los derechos humanos, con especial énfasis en las poblaciones más vulnerables.
+
+  utter_faq/defensoria_funcion_principal:
+  - text: |
+      Su función principal es la defensa, promoción y divulgación de los derechos humanos y del Derecho Internacional Humanitario en Colombia.
+
+  utter_faq/defensoria_autonomia:
+  - text: |
+      No. Aunque es una entidad estatal, la Defensoría del Pueblo es autónoma e independiente del Gobierno Nacional.
+
+  utter_faq/servicios_que_presta:
+  - text: |
+      La Defensoría presta, entre otros, estos servicios:
+      • Orientación jurídica gratuita.
+      • Atención a víctimas del conflicto armado.
+      • Protección de derechos fundamentales (incluye apoyo en tutelas).
+      • Acompañamiento a grupos en vulnerabilidad (mujeres, NNA, personas LGBTIQ+, indígenas, migrantes, etc.).
+      • Emisión y seguimiento de Alertas Tempranas (SAT).
+      Para saber más: www.defensoria.gov.co
+
+  utter_faq/publicaciones_donde:
+  - text: |
+      Puedes consultar boletines, informes y estudios en la sección “Publicaciones” del sitio web oficial:
+      www.defensoria.gov.co (menú Publicaciones).
+
+  utter_faq/contacto_lineas:
+  - text: |
+      Canales de contacto:
+      • Línea nacional gratuita: 01 8000 914 814
+      • Bogotá: (601) 314 7300
+      • Correo: atencionalciudadano@defensoria.gov.co
+      • Presencial: 42 Defensorías Regionales (consulta la sede más cercana en el sitio web).
+
+forms:
+  pqrsdf_form:
+    required_slots:
+      - tipo_pqrs
+      - nombre_completo
+      - numero_identificacion
+      - correo_contacto
+      - telefono_contacto  # Incluir telefono_contacto si tiene mapping
+      - descripcion_caso
+      - medio_notificacion
+
+  contacto_form:
+    required_slots:
+      - nombre_contacto
+      - telefono_contacto
+
+  consulta_proceso_form:
+    required_slots:
+      - numero_identificacion
+
+actions:
+  - action_lookup_cedula  
+  - action_default_fallback
+  - action_buscar_regional
+  - action_handoff
+  - validate_contacto_form
+  - validate_pqrsdf_form
+  - action_reset_pqrs_slots
+
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true
