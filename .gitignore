@@ -19,10 +19,7 @@ venv/
 # Logs y artefactos
 *.log
 
-# Modelos y artefactos pesados
-models/*
-!models/.gitkeep
-*.tar.gz
+
 
 # Node (si existiera)
 node_modules/
