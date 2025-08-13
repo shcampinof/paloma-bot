@@ -9,4 +9,3 @@ rasa_env/
 .vscode/
 *.log
 *.tmp
-# IMPORTANTE: NO ignores models/, data/, actions/, templates/, static/

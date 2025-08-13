@@ -24,4 +24,7 @@ ENV RASA_URL=http://127.0.0.1:5005/webhooks/rest/webhook
 # Puerto por defecto en local (HF/Render lo inyectan en prod):
 ENV PORT=7860
 
+ENV HOME=/app
+
+
 CMD ["honcho","start"]
